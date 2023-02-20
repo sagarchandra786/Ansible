@@ -1,0 +1,55 @@
+---
+
+ - hosts: slave1
+   become: yes
+   vars:
+     doc: /etc/sagar.txt
+   name: Installing apache2 in slave1
+   tasks:
+    - name: Install Apache2
+      apt: 
+        name=apache2 
+        state=latest
+      notify: Restart Apache2
+    - name: copy src as dest in the same dir
+      copy:
+        src: /etc/ansible/sagar.txt
+        dest: /etc/
+      tags:
+        - sagar_copy
+    - name: Set mode access
+      file:
+        path: "{{ doc }}"
+        state: file
+        mode: '600'
+ - hosts: slave2
+   become: yes
+   vars: 
+     favorite_snacks:
+       - hotdog
+       - ice cream
+       - chips
+   name: Installing nginx in slave2
+   tasks:
+    - name: Install Nginx
+      apt: name=nginx state=latest
+      notify: Restart Nginx
+    - name: copy src as dest in the same dir 
+      copy:
+        src: /etc/ansible/script.sh
+        dest: /etc/
+      tags:
+        - simple_copy
+    - name: create a directory
+      file: 
+        path: /etc/snacks
+        state: directory
+        mode: '777'
+    - name: create directories for storing my snacks
+      file: path=/etc/snacks/{{ item }} state=directory
+      with_items: '{{ favorite_snacks }}'
+   handlers:
+    - name: Restart Nginx
+      service:
+        name=nginx
+        state=restarted

@@ -1,0 +1,8 @@
+---
+- name: use motd role playbook
+  hosts: slave1
+  become: true
+
+  roles:
+    - role: motd
+      system_manager: sagarchandra500@gmail.com
